@@ -43,6 +43,11 @@ report_utilization -file [file join $reports_dir utilization_impl.rpt]
 report_timing_summary -file [file join $reports_dir timing_summary_impl.rpt]
 report_drc -file [file join $reports_dir drc_impl.rpt]
 
+set drc_violations [get_drc_violations -quiet]
+if {[llength $drc_violations] != 0} {
+    error "Post-route DRC failed with [llength $drc_violations] violation(s); see [file join $reports_dir drc_impl.rpt]"
+}
+
 set worst_setup_path [get_timing_paths -delay_type max -max_paths 1]
 set worst_hold_path [get_timing_paths -delay_type min -max_paths 1]
 if {[llength $worst_setup_path] == 0 || [get_property SLACK $worst_setup_path] < 0.0} {

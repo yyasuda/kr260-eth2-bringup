@@ -1,5 +1,6 @@
 hardware/build/
 hardware/reports/
+hardware/artifacts/
 boot/build/
 *.jou
 *.log

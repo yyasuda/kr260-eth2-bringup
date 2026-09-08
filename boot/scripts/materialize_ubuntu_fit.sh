@@ -12,7 +12,7 @@ fdtput="${native_bin%/dtc}/fdtput"
 dumpimage=$(find "$build_dir" -type f -name dumpimage -print -quit)
 : "${dumpimage:?dumpimage not found}"
 fit=${1:?known-good image.fit path required}
-overlay="$tree/dts/gem2_j10b_ubuntu_overlay.dts"
+overlay="$tree/gem2_j10b_ubuntu_overlay.dts"
 out=${2:-"$tree/artifacts/image-gem2-j10b.fit"}
 tmp=$(mktemp -d)
 trap 'rm -rf "$tmp"' EXIT

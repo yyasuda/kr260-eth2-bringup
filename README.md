@@ -35,7 +35,7 @@ release/image-gem2-j10b.fit
 ## 構成
 
 ```text
-hardware/   Vivado block design生成Tcl、XDC、参照bit/XSA
+hardware/   Vivado block design生成Tcl、XDC、build出力先
 boot/       EDF/Yocto layer、FSBL権限patch、Ubuntu FIT生成script
 release/    実機でlink-upを確認した組合せの配布用BOOT.BIN/FIT
 scripts/    KR260側での事前確認・事後確認script
