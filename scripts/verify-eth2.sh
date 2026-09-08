@@ -9,6 +9,7 @@ echo '== Boot firmware A/B =='
 sudo xmutil bootfw_status
 echo '== eth2 =='
 ip -details link show eth2
+readlink -f /sys/class/net/eth2/device
 ethtool -i eth2
 ethtool eth2
 echo '== macb / PHY kernel messages =='

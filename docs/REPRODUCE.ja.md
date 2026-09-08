@@ -81,17 +81,45 @@ slot別ではなく、両slotから共有される `/boot/firmware` 上のファ
 sha256sum -c SHA256SUMS
 scp release/BOOT-gem2-j10b.bin ubuntu@KR260:/tmp/
 scp release/image-gem2-j10b.fit ubuntu@KR260:/tmp/
+scp boot/systemd-network/*.link ubuntu@KR260:/tmp/
 ```
 
 KR260側でも照合します。
 
 ```bash
-sha256sum /tmp/BOOT-gem2-j10b.bin /tmp/image-gem2-j10b.fit
+sha256sum /tmp/BOOT-gem2-j10b.bin /tmp/image-gem2-j10b.fit \
+  /tmp/10-gem0-eth0.link /tmp/11-gem1-eth1.link /tmp/12-gem2-eth2.link
 ```
 
 期待値は `SHA256SUMS` と一致する必要があります。
 
-## 3. 共有FITのバックアップと置換
+## 3. Ethernet名をKR260のport表記に合わせる
+
+DT aliasとsystemdのpath-based `.link` filesを組み合わせ、次の対応を固定します。
+
+```text
+eth0 = J10D / GEM0 / ff0b0000
+eth1 = J10C / GEM1 / ff0c0000
+eth2 = J10B / GEM2 / ff0d0000
+```
+
+Ubuntuのdefault naming policyではDT aliasを基に `end0` などへrenameされるため、次を配置します。
+
+```bash
+sudo rm -f /etc/systemd/network/10-gem1-eth0.link \
+  /etc/systemd/network/11-gem0-eth1.link
+sudo install -m 0644 /tmp/10-gem0-eth0.link /etc/systemd/network/
+sudo install -m 0644 /tmp/11-gem1-eth1.link /etc/systemd/network/
+sudo install -m 0644 /tmp/12-gem2-eth2.link /etc/systemd/network/
+```
+
+最初のコマンドは、本リポジトリの旧手順で作成した逆順のcustom `.link` filesが残っている場合に
+削除するためのものです。これらが残ると新旧設定が競合します。
+
+設定は次回boot時に反映されます。既存のnetwork設定がinterface名を参照している場合は、
+J10Dを `eth0`、J10Cを `eth1` とする上記対応に合わせて事前に修正してください。
+
+## 4. 共有FITのバックアップと置換
 
 `image.fit` は共有boot partition上にあるため、先に一意な名前でバックアップします。
 
@@ -107,7 +135,7 @@ sudo sync
 sha256sum /boot/firmware/image.fit
 ```
 
-## 4. dfx-mgrによるflat PL designの上書きを抑止する
+## 5. dfx-mgrによるflat PL designの上書きを抑止する
 
 KR260の標準Ubuntu環境には `dfx-mgr` serviceが用意されており、`xmutil loadapp`を使って
 現在のaccelerated applicationを確認したり、cold bootせずにPL designを動的に入れ替えたり
@@ -125,7 +153,7 @@ systemctl is-enabled dfx-mgr.service
 
 出力が `masked` であることを確認します。
 
-## 5. inactive Boot FW slotへ書く
+## 6. inactive Boot FW slotへ書く
 
 直前にもう一度 `sudo xmutil bootfw_status` を確認します。次のコマンドはinactive imageを
 更新し、次回boot対象にします。
@@ -138,7 +166,7 @@ sudo xmutil bootfw_status
 新しいimageが `Requested Boot Image` かつ `Non Bootable`、既知正常imageが `Bootable`
 のままであることを確認します。ここで `xmutil bootfw_update -v` はまだ実行しません。
 
-## 6. UART監視下でcold boot
+## 7. UART監視下でcold boot
 
 warm rebootではなく電源を完全に切ってから再投入します。UARTでFSBL、PMUFW、TF-A、
 U-Boot、Linux loginまで進むことを確認します。ログイン後に実行します。
@@ -171,7 +199,7 @@ sudo xmutil bootfw_update -v
 sudo xmutil bootfw_status
 ```
 
-## 7. 双方向フレーム確認（未完了項目）
+## 8. 双方向フレーム確認（未完了項目）
 
 外部Linux hostとJ10Bを接続し、別subnetの固定IPを仮設定します。
 
@@ -196,3 +224,7 @@ trial bootが失敗した場合は既知正常slotへfallbackさせ、UARTログ
 起動できるがnetworkだけ失敗した場合は、保存した `image.fit.backup-*` を
 `/boot/firmware/image.fit` に戻し、`sync`後にcold bootします。slot選択を推測で操作したり、
 `fw_setenv` を使ったりしないでください。
+
+旧FITへ戻す際に旧来のinterface名も必要なら、今回配置した
+`10-gem0-eth0.link`、`11-gem1-eth1.link`、`12-gem2-eth2.link` も退避または削除してから
+cold bootします。

@@ -34,7 +34,7 @@
 
 /* Keep Linux eth numbering stable when GEM2 becomes probeable. */
 &{/aliases} {
-	ethernet0 = "/axi/ethernet@ff0c0000";
-	ethernet1 = "/axi/ethernet@ff0b0000";
+	ethernet0 = "/axi/ethernet@ff0b0000";
+	ethernet1 = "/axi/ethernet@ff0c0000";
 	ethernet2 = "/axi/ethernet@ff0d0000";
 };

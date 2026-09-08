@@ -71,6 +71,11 @@ Ubuntu FIT内のDevice TreeにGEM2、GMII-to-RGMII converter（MDIO address 8）
 （MDIO address 2）を記述し、GEM2/J10Bを `eth2` として使用します。Linux起動後もこの
 boot時のPL configurationを維持するため、`dfx-mgr.service`を無効化します。
 
+Ethernet名はKR260のport表記に合わせ、J10D/GEM0を `eth0`、J10C/GEM1を `eth1`、
+J10B/GEM2を `eth2` とします。Ubuntuのpredictable network interface namingによる
+`end0` などへのrenameを避けるため、`boot/systemd-network/` のpath-based `.link` filesも
+配置します。
+
 ```text
 Ubuntu eth2 / macb (PS GEM2)
              |
