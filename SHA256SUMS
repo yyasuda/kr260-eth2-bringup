@@ -1,0 +1,6 @@
+69976611f88f3d111ab9a42e8126f051cec1b1f1fd258a36ea7e0f436530eab1  boot/artifacts/gem2_j10b.bit
+08252fa882687f0ee8095b45bee83cfb2803de86a6f60167488f2faf2944e71b  boot/artifacts/gem2_j10b.xsa
+9e5a9d6a631703cd031a451c6a545a0daced35a2206938f1fbf732fa37faff80  boot/artifacts/sdt-gem2-j10b.tar.gz
+f4cfc9f40ac58835a8aa087ca084ff01272b612965e30a5ea5e651233b2fd3ec  release/BOOT-gem2-j10b.bin
+572e93a2a4a8fbe82f9b8e80fb71ca031d33f0b13dec0d36965ed1582c009ac3  release/BOOT-gem2-j10b.manifest.json
+0384ace9bccd429f509d8f99bbfe3c6087ca9e47aec68854de1a0f168d5451f0  release/image-gem2-j10b.fit

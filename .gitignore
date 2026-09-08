@@ -1,0 +1,7 @@
+hardware/build/
+hardware/reports/
+boot/build/
+*.jou
+*.log
+*.str
+.Xil/

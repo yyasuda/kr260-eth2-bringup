@@ -1,0 +1,27 @@
+/* Qiita GEM2/J10B topology for the Ubuntu kernel DT. */
+
+&gem2 {
+	status = "okay";
+	phy-mode = "gmii";
+	phy-handle = <&phy2>;
+
+	mdio {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		enet2_gmii_to_rgmii: ethernet-phy@8 {
+			compatible = "xlnx,gmii-to-rgmii-1.0";
+			reg = <8>;
+			phy-handle = <&phy2>;
+		};
+
+		phy2: ethernet-phy@2 {
+			compatible = "ethernet-phy-id2000.a231";
+			reg = <2>;
+			ti,dp83867-rxctrl-strap-quirk;
+			ti,fifo-depth = <1>;
+			ti,tx-internal-delay = <4>;
+			ti,rx-internal-delay = <4>;
+		};
+	};
+};

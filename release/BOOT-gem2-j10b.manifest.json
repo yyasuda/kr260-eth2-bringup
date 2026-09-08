@@ -1,0 +1,27 @@
+{
+  "device-tree": {
+    "branch": "xlnx_rebase_v2026.01",
+    "srcrev": "980da51527e0a9a7a79ac218347ade2bfd5bb330",
+    "sdt_file": "k26-smk-kr-sdt_2026.1_0609_1_06092108.tar.gz",
+    "sdt_sha256": "e0bd459b8f7bbee7b654f3bb88d56f2071e33e7f60e641f09c3f3c3c7e6262f3"
+  },
+  "u-boot": {
+    "branch": "xlnx_rebase_v2026.01",
+    "srcrev": "9a86d4351c5e29db068a2a0e230b74d4fbd55997"
+  },
+  "fsbl": {
+    "branch": "xlnx_rel_v2026.1",
+    "srcrev": "2fb454742f9d42e23a46a13c0eb09e29dc52c6d1"
+  },
+  "trusted-firmware-a": {
+    "branch": "xlnx_rebase_v2.14",
+    "srcrev": "e9b1373a7dd9fce25b5a2fe6189dd5ec6eedf24a"
+  },
+  "pmu-firmware": {
+    "branch": "xlnx_rel_v2026.1",
+    "srcrev": "2fb454742f9d42e23a46a13c0eb09e29dc52c6d1"
+  },
+  "bootbin-version-header": {
+    "version": "k26-smk-kr-sdt-v1.07-20260609231841"
+  }
+}
