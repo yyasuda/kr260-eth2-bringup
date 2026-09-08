@@ -56,7 +56,6 @@ byte-for-byteで一致したことを確認済みです。本リポジトリの�
 次をKR260側で実行し、結果を保存します。
 
 ```bash
-set -o pipefail
 sudo ./scripts/preflight.sh | tee preflight-before.txt
 ```
 
@@ -68,9 +67,8 @@ sudo ./scripts/preflight.sh | tee preflight-before.txt
 - `release/` のハッシュが `SHA256SUMS` と一致する
 - UART consoleからboot失敗を観測・復旧できる
 
-scriptはBoot FW A/B、Last Booted Image、boot partitionと `image.fit` を自動判定し、条件を
-満たさなければ非0で終了します。UART consoleと復旧手段は自動判定できないため、作業者が
-確認します。配布物のハッシュは次節で転送前後に別途確認します。
+scriptは判断材料を表示する情報収集用であり、合否を自動判定しません。上記条件との照合は
+作業者が行います。配布物のハッシュは次節で転送前後に別途確認します。
 
 Boot FWのinactive slotへの更新は既知正常slotを残せる場合だけ行います。`image.fit` はA/B
 slot別ではなく、両slotから共有される `/boot/firmware` 上のファイルです。
@@ -146,7 +144,6 @@ warm rebootではなく電源を完全に切ってから再投入します。UAR
 U-Boot、Linux loginまで進むことを確認します。ログイン後に実行します。
 
 ```bash
-set -o pipefail
 sudo ./scripts/verify-eth2.sh | tee eth2-after.txt
 ```
 
@@ -157,8 +154,8 @@ sudo ./scripts/verify-eth2.sh | tee eth2-after.txt
 - `ethtool eth2`: 1000Mb/s、Full、PHYAD 2、Link detected yes
 - J10Bとpeer双方のlink LEDが点灯し、cable挿抜に追従
 
-scriptはservice状態、`LOWER_UP`、speed、duplex、PHYAD、link状態を自動判定し、条件を
-満たさなければ非0で終了します。LEDとcable挿抜への追従は作業者が確認します。
+scriptは判断材料を表示する情報収集用であり、合否を自動判定しません。上記条件との照合、
+LEDとcable挿抜への追従確認は作業者が行います。
 
 筆者の環境では、調査中に一度だけJ10BのPHYが通常のMDIO address 2ではなくaddress 13で
 見えたことがありました。trouble時には `mdio-tools`を別途導入し、PHY@2のID registerが
