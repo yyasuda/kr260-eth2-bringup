@@ -4,6 +4,11 @@ set project_name gem2_j10b
 set project_dir [file join $root_dir build vivado]
 set reports_dir [file join $root_dir reports]
 set artifacts_dir [file join $root_dir artifacts]
+
+if {[info exists ::env(BOARD_REPO_PATHS)] && $::env(BOARD_REPO_PATHS) ne ""} {
+    set_param board.repoPaths [split $::env(BOARD_REPO_PATHS) ":"]
+}
+
 file mkdir $project_dir
 file mkdir $reports_dir
 file mkdir $artifacts_dir

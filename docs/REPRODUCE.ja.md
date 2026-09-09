@@ -73,6 +73,13 @@ scriptは判断材料を表示する情報収集用であり、合否を自動�
 Boot FWのinactive slotへの更新は既知正常slotを残せる場合だけ行います。`image.fit` はA/B
 slot別ではなく、両slotから共有される `/boot/firmware` 上のファイルです。
 
+一方でも`Non Bootable`の場合は、その場で`bootfw_update -v`や別slotへのwriteを行わず、
+表示結果とUART boot logを保存して停止します。まず現在実行中のimage、fallback可能な
+`Bootable` image、`Non Bootable`になった経緯を特定してください。独立に検証した既知正常な
+Boot FWとAMDの公式recovery/update手順を用意し、唯一の`Bootable` imageを上書きせずに
+両slotを復旧できる方針を決めてから別作業として処置します。両slotが`Bootable`で、失敗時に
+既知正常slotへ戻れることを再確認するまで、本手順の第2節以降へ進みません。
+
 ## 2. ファイルをKR260へ転送
 
 ホスト側でリポジトリrootから実行します（hostname/IPは環境に合わせます）。

@@ -2,11 +2,23 @@
 
 ## Vivado hardware
 
-Vivado 2026.1とKR260 Board Store 2.0を使用します。
+Vivado 2026.1とKR260 Board Store 2.0を使用します。Vivado 2026.1の標準installに
+`kr260_carrier` board filesが無い場合は、公開Board Storeを別directoryへ取得します。
+
+```bash
+git clone https://github.com/Xilinx/XilinxBoardStore.git /path/to/XilinxBoardStore
+git -C /path/to/XilinxBoardStore checkout e0b28fff9bde171b62848d18a53763433a1ec5b2
+```
+
+上記commitは参照buildで使用した`xilinx.com:kr260_som:part0:2.0`と
+`xilinx.com:kr260_carrier:*:2.0`を含みます。`boards/Xilinx`を
+`BOARD_REPO_PATHS`で指定してbuildします。既に同じboard partsをVivadoから参照できる場合、
+この環境変数は不要です。
 
 ```bash
 source /path/to/AMD/2026.1/Vivado/settings64.sh
-vivado -mode batch -nolog -nojournal -notrace -source hardware/tcl/build.tcl
+BOARD_REPO_PATHS=/path/to/XilinxBoardStore/boards/Xilinx \
+  vivado -mode batch -nolog -nojournal -notrace -source hardware/tcl/build.tcl
 sha256sum hardware/artifacts/gem2_j10b.bit hardware/artifacts/gem2_j10b.xsa
 ```
 
@@ -41,13 +53,25 @@ Vivado build由来であることを確認してからEDF buildへ進みます�
 
 ## EDF 26.06 Boot FW
 
-AMD EDFの `amd-edf-rel-v26.06` manifestを用意し、リポジトリの
+`repo` commandを用意し、AMD EDFの`amd-edf-rel-v26.06` manifestを新しいdirectoryへ
+取得します。
+
+```bash
+mkdir edf-26.06
+cd edf-26.06
+repo init -u https://github.com/Xilinx/yocto-manifests.git \
+  -b refs/tags/amd-edf-rel-v26.06 -m default-edf.xml
+repo sync
+cd edf
+```
+
+EDFの
 `boot/meta-gem2-j10b` layerを `BBLAYERS` に追加します。layer内の
 `sdt-artifacts.bbappend` は上記XSA由来の `boot/artifacts/sdt-gem2-j10b.tar.gz` を使い、
 FSBL用DTへGEM2のA53 permission patchを適用します。
 
 ```bash
-source /path/to/edf/edf-init-build-env build
+source /path/to/edf-26.06/edf/edf-init-build-env build
 bitbake-layers add-layer /path/to/this-repo/boot/meta-gem2-j10b
 MACHINE=k26-smk-kr-sdt-multidomain bitbake xilinx-bootbin
 ```
