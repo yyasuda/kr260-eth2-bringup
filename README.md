@@ -41,7 +41,7 @@ release/image-gem2-j10b.fit
 hardware/   Vivado block design生成Tcl、XDC、build出力先
 boot/       EDF/Yocto layer、FSBL権限patch、Ubuntu FIT生成script
 release/    実機確認構成を基にした配布用BOOT.BIN/FIT
-scripts/    KR260側での事前確認・事後確認script
+scripts/    KR260側での事前・事後確認、およびraw Ethernet frame送信script
 docs/       buildおよび安全なdeployment手順
 ```
 

@@ -213,6 +213,56 @@ external host -> KR260 eth2: seq=68, length=68, payload="SEQ=0068 LEN=0068" + D 
 それぞれ一致しました。これにより、GEM2、EMIO GMII、GMII-to-RGMII、DP83867、J10Bを
 通るraw Ethernet frameのend-to-end TX/RXを双方向とも確認済みです。
 
+試験には [`scripts/send_seq_frame.py`](../scripts/send_seq_frame.py) を使用します。このscriptは
+引数をsequence番号とFCSを除くEthernet frame長の両方として扱い、payload先頭へ
+`SEQ=nnnn LEN=nnnn`を格納し、残りをsequence番号の下位8 bitで埋めたbroadcast frameを
+1個送信します。default interfaceは`eth2`であり、`-i`で変更できます。raw socketを使うため
+root権限が必要です。
+
+例えば外部hostで受信を開始し、KR260からsequence 68を送信します。
+
+```bash
+# 外部host（interface名は置換）
+sudo tcpdump -i PEER_IF -e -XX -n 'ether proto 0x88b5'
+
+# KR260（repository rootで実行）
+sudo python3 scripts/send_seq_frame.py 68
+```
+
+KR260側の送信結果は次でした。
+
+```text
+sent seq=68 frame_len=68 payload_len=54 ethertype=0x88b5 interface=eth2 bytes_sent=68
+```
+
+外部host側ではsourceがKR260 `eth2`のMAC address、destinationがbroadcast、
+EtherType `0x88b5`、length 68であること、および次のpayloadを確認しました。
+
+```text
+0x0000:  ffff ffff ffff xxxx xxxx xxxx 88b5 5345
+0x0010:  513d 3030 3638 204c 454e 3d30 3036 3820
+0x0020:  4444 4444 4444 4444 4444 4444 4444 4444
+0x0030:  4444 4444 4444 4444 4444 4444 4444 4444
+0x0040:  4444 4444
+```
+
+`xxxx xxxx xxxx`は公開用に伏せたKR260 `eth2`のsource MAC addressです。
+
+逆方向はKR260の`eth2`で同じfilterの`tcpdump`を開始し、外部hostでinterfaceを指定して
+送信します。scriptの`IFACE`を書き換える必要はありません。
+
+```bash
+# KR260
+sudo tcpdump -i eth2 -e -XX -n 'ether proto 0x88b5'
+
+# 外部host（repository rootで実行、interface名は置換）
+sudo python3 scripts/send_seq_frame.py -i PEER_IF 67
+```
+
+通常のinterfaceではIPv6 Neighbor DiscoveryやRouter Solicitationなどの背景trafficが発生し得ます。
+filterなしでcaptureする場合は、それらをtest frameと混同しないでください。上記の
+`ether proto 0x88b5` filterを使えば、このtest frameだけを表示できます。
+
 frame試験後にもう一度clean cold startし、PHY@2のID `0x2000/0xa231`、PHYAD 2、
 1000Mb/s Full、`Link detected: yes`、`eth2` LOWER_UPが再現し、PHY@13は不在であることも
 確認しました。PHY@13は調査中に一度だけ観測された原因未解明の状態として扱い、clean
