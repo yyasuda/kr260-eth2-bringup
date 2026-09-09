@@ -16,7 +16,7 @@ DP83867 (U79) に接続し、J10B を Linux の `eth2` として使用するた�
 
 EtherType `0x88b5`のsequence/length test frameを使用し、67-byte frameのTXと68-byte
 frameのRXについて、外部hostとKR260双方の`tcpdump`で長さとpayloadの一致を確認しました。
-IP addressを設定したARP/ICMP等のIP疎通はまだ確認していません。
+一時的な固定IP addressを設定し、ARP解決とICMP echoによるIP疎通も確認しました。
 
 ## 最短の再現方法
 

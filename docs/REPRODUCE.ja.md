@@ -275,9 +275,10 @@ frame試験後にもう一度clean cold startし、PHY@2のID `0x2000/0xa231`、
 確認しました。PHY@13は調査中に一度だけ観測された原因未解明の状態として扱い、clean
 cold startで再現した場合にのみ追加調査します。
 
-### IP疎通の追加確認（未完了）
+### IP疎通の追加確認
 
-外部Linux hostとJ10Bを接続し、別subnetの固定IPを仮設定します。
+外部Linux hostとJ10Bを接続し、既存ネットワークと競合しない別のnetwork addressから
+固定IPを一時的に設定します。
 
 ```bash
 # KR260
@@ -287,12 +288,18 @@ sudo ip link set eth2 up
 # peer（interface名は置換）
 sudo ip addr add 192.0.2.1/24 dev PEER_IF
 sudo tcpdump -ni PEER_IF 'arp or icmp'
-ping -c 4 192.0.2.2
 ```
 
-KR260側でも `sudo tcpdump -ni eth2 'arp or icmp'` を動かし、ARP/ICMPを両方向で確認します。
-`192.0.2.0/24` は文書用アドレスですが、既存routeと競合する場合は別のisolated subnetを
-選びます。
+上記の設定とpeer側のcapture開始後、KR260側からpingします。
+
+```bash
+ping -c 4 192.0.2.1
+```
+
+必要に応じてKR260側でも `sudo tcpdump -ni eth2 'arp or icmp'` を動かし、ARP request/replyと
+ICMP echo request/replyを両端で確認します。`192.0.2.0/24`はこのドキュメントのために仮に
+付けたアドレスです。既存ネットワークや既存routeと競合する場合は、別のネットワークアドレスを
+選んでください。
 
 ## 復旧
 
