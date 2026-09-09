@@ -3,7 +3,7 @@
 AMD Kria KR260 の PS GEM2 を EMIO 経由で PL の GMII-to-RGMII と carrier 上の
 DP83867 (U79) に接続し、J10B を Linux の `eth2` として使用するための再現用成果物です。
 
-実機確認済みの到達点（2026-09-08）は次の通りです。
+実機確認済みの到達点（2026-09-09）は次の通りです。
 
 - Ubuntu 24.04.2 LTS / Xilinx kernel 6.8.0-1035-xilinx
 - Vivado 2026.1 build 6511674
@@ -11,9 +11,12 @@ DP83867 (U79) に接続し、J10B を Linux の `eth2` として使用するた�
 - PHY address 2、PHY ID `0x2000:0xa231`
 - `eth2` が `UP,LOWER_UP`、1000 Mb/s、full duplex、auto-negotiation完了
 - J10B と外部switch双方のlink LED点灯およびcable挿抜への追従
+- KR260 `eth2`から外部host、および外部hostからKR260 `eth2`へのraw Ethernet frame転送
+- PHY address 2と1GbE linkが複数回のclean cold start後にも再現
 
-まだ確認していないのは、外部ホストとの実フレーム双方向疎通です。したがって現時点の
-成果は「物理リンク確立まで」であり、IP疎通確認済みとは表現しません。
+EtherType `0x88b5`のsequence/length test frameを使用し、67-byte frameのTXと68-byte
+frameのRXについて、外部hostとKR260双方の`tcpdump`で長さとpayloadの一致を確認しました。
+IP addressを設定したARP/ICMP等のIP疎通はまだ確認していません。
 
 ## 最短の再現方法
 
@@ -37,7 +40,7 @@ release/image-gem2-j10b.fit
 ```text
 hardware/   Vivado block design生成Tcl、XDC、build出力先
 boot/       EDF/Yocto layer、FSBL権限patch、Ubuntu FIT生成script
-release/    実機でlink-upを確認した組合せの配布用BOOT.BIN/FIT
+release/    実機確認構成を基にした配布用BOOT.BIN/FIT
 scripts/    KR260側での事前確認・事後確認script
 docs/       buildおよび安全なdeployment手順
 ```

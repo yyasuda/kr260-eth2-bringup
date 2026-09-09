@@ -199,7 +199,26 @@ sudo xmutil bootfw_update -v
 sudo xmutil bootfw_status
 ```
 
-## 8. 双方向フレーム確認（未完了項目）
+## 8. 双方向フレーム確認
+
+参照環境では、KR260 J10Bと外部hostのinterfaceをEthernet switch経由で接続し、
+EtherType `0x88b5`のsequence/length test frameを用いて次を確認しました。
+
+```text
+KR260 eth2 -> external host: seq=67, length=67, payload="SEQ=0067 LEN=0067" + C pattern
+external host -> KR260 eth2: seq=68, length=68, payload="SEQ=0068 LEN=0068" + D pattern
+```
+
+送受信側のMAC address、EtherType、frame length、sequence/length field、残りのpayloadが
+それぞれ一致しました。これにより、GEM2、EMIO GMII、GMII-to-RGMII、DP83867、J10Bを
+通るraw Ethernet frameのend-to-end TX/RXを双方向とも確認済みです。
+
+frame試験後にもう一度clean cold startし、PHY@2のID `0x2000/0xa231`、PHYAD 2、
+1000Mb/s Full、`Link detected: yes`、`eth2` LOWER_UPが再現し、PHY@13は不在であることも
+確認しました。PHY@13は調査中に一度だけ観測された原因未解明の状態として扱い、clean
+cold startで再現した場合にのみ追加調査します。
+
+### IP疎通の追加確認（未完了）
 
 外部Linux hostとJ10Bを接続し、別subnetの固定IPを仮設定します。
 
