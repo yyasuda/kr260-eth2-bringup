@@ -68,7 +68,10 @@ cd edf
 EDFの
 `boot/meta-gem2-j10b` layerを `BBLAYERS` に追加します。layer内の
 `sdt-artifacts.bbappend` は上記XSA由来の `boot/artifacts/sdt-gem2-j10b.tar.gz` を使い、
-FSBL用DTへGEM2のA53 permission patchを適用します。
+FSBL用DTへGEM2のA53 permission patchを適用します。また、`bitstream_%.bbappend`が
+`boot/artifacts/gem2_j10b.bit`を`virtual/bitstream`へ供給し、
+`xilinx-bootbin.bbappend`がKriaでdefaultでは無効なboot-time bitstream partitionを
+明示的に有効化します。
 
 ```bash
 source /path/to/edf-26.06/edf/edf-init-build-env build
@@ -76,9 +79,26 @@ bitbake-layers add-layer /path/to/this-repo/boot/meta-gem2-j10b
 MACHINE=k26-smk-kr-sdt-multidomain bitbake xilinx-bootbin
 ```
 
-参照BOOT.BINはFSBL、PMUFW、PL bitstream、TF-A、machine DTB、U-Bootの順です。最終imageで
-GEM2 (`NODE_ETH_2`, `0xff0d0000`) がA53にshareable resourceとして割り当てられていること、
-PL partitionが存在することをdeployment前に確認してください。
+生成されたBIFとBOOT.BINのpartition headerを必ず確認します。`source`後のbuild directoryで
+実行します。
+
+```bash
+deploy_dir="tmp/deploy/images/k26-smk-kr-sdt-multidomain"
+boot_bin=$(readlink -f "$deploy_dir/boot.bin")
+
+sed -n '1,120p' "$deploy_dir/boot.bin-extracted/bootgen.bif"
+bootgen -arch zynqmp -read "$boot_bin" pht
+stat -c '%s %n' "$boot_bin"
+sha256sum "$boot_bin"
+```
+
+参照BOOT.BINはFSBL、PMUFW、PL bitstream、TF-A、machine DTB、U-Bootの順です。BIFに
+`[destination_device=pl] download-k26-smk-kr-sdt-multidomain.bit`があり、PHTでも同partitionが
+`dest_device [PL]`であることを確認してください。参照buildのBOOT.BINは9,733,128 bytesです。
+1,935,432 bytes程度の場合はPL partitionが欠落しているためdeploymentしてはいけません。
+
+さらに最終imageでGEM2 (`NODE_ETH_2`, `0xff0d0000`) がA53にshareable resourceとして
+割り当てられていることをdeployment前に確認してください。
 
 ## Ubuntu FIT
 
